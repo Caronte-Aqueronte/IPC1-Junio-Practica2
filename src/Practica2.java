@@ -57,6 +57,7 @@ public class Practica2 {
                     crearPelicula();
                     break;
                 case 5:
+                    ordenarPeliculas();
                     break;
                 case 6:
                     crearCliente();
@@ -142,24 +143,29 @@ public class Practica2 {
     public void prestarPeliculas() {
         int idPelicula;
         int idCliente;
-        boolean banderaExistencias = mostrarPeliculas();
+        int dias;
         boolean prestado;
         boolean disponible;
+        boolean banderaExistencias = mostrarPeliculas();
         if (banderaExistencias == true) {
 
             System.out.println("Ingrese su id de cliente");
             idCliente = scanner.nextInt();
             prestado = estadoCliente(idCliente);
 
-            if (prestado == true) {
+            if (prestado == false) {
 
                 System.out.println("Ingrese el id de la pelicula a su eleccion");
                 idPelicula = scanner.nextInt();
                 disponible = estadoPelicula(idPelicula);
 
                 if (disponible == true) {
+                    System.out.println("Ingrese los dias que la prestara");
+                    dias = scanner.nextInt();
                     cambiarEdadoPelicula(idPelicula, false);
                     cambiarEstadoCliente(idCliente, true);
+                    llenarMatriz(idPelicula, idCliente, dias);
+                    System.out.println("Pelicula prestada");
                 } else {
                     System.out.println("Pelicula no disponible");
                 }
@@ -181,11 +187,12 @@ public class Practica2 {
         for (int x = 0; x < idCliente.length; x++) {
             if (id == idCliente[x]) {
                 if (tienePrestado[x] == false) {
-                    return true;
+                    return false;
                 }
+                break;
             }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -199,6 +206,7 @@ public class Practica2 {
                 if (disponibilidadPelicula[x] == true) {
                     return true;
                 }
+                break;
             }
         }
         return false;
@@ -214,6 +222,7 @@ public class Practica2 {
         for (int x = 0; x < idCliente.length; x++) {
             if (id == idCliente[x]) {
                 tienePrestado[x] = nuevoEstado;
+                break;
             }
         }
     }
@@ -228,6 +237,7 @@ public class Practica2 {
         for (int x = 0; x < idPelicula.length; x++) {
             if (id == idPelicula[x]) {
                 disponibilidadPelicula[x] = nuevoEstado;
+                break;
             }
         }
     }
@@ -269,8 +279,14 @@ public class Practica2 {
         }
         System.out.println("Cliente NO registrado, se alcanzo el maximo de clientes");
     }
-    
-     public boolean mostrarClientes() {
+
+    /**
+     * Este metodo retorna un boolean que puede ser utilizado o no muestra los
+     * clientes en caso hayan registrados
+     *
+     * @return
+     */
+    public boolean mostrarClientes() {
         if (idCliente[0] != 0) {
             for (int x = 0; x < idCliente.length; x++) {
                 System.out.println("Id: " + idCliente[x] + " Nombre: " + nombreCliente[x] + " Telefono: " + telefonoCliente[x] + " Tiene prestado pelicula: " + tienePrestado[x]);
@@ -279,7 +295,60 @@ public class Practica2 {
                 }
             }
         }
-        System.out.println("Aun no hay clientes ingresados");
+        System.out.println("Aun no hay clientes registrados");
         return false;
+    }
+
+    public void ordenarPeliculas() {
+
+        int i;
+        int j;
+        String auxString;
+        int auxInt;
+        boolean auxBoolean;
+        for (i = 0; i < nombrePelicula.length - 1; i++) {
+            for (j = 0; j < nombrePelicula.length - i - 1; j++) {
+                if (nombrePelicula[j + 1] != null && nombrePelicula[j] != null && nombrePelicula[j + 1].compareTo(nombrePelicula[j]) < 0) {
+                    //aqui cambiamos para el nombre de la pelicula
+                    auxString = nombrePelicula[j + 1];
+                    nombrePelicula[j + 1] = nombrePelicula[j];
+                    nombrePelicula[j] = auxString;
+                    //
+                    //aqui cambiamos para el id de la pelicula
+                    auxInt = idPelicula[j + 1];
+                    idPelicula[j + 1] = idPelicula[j];
+                    idPelicula[j] = auxInt;
+                    //
+                    //aqui cambiamos para el age 
+                    auxInt = age[j + 1];
+                    age[j + 1] = age[j];
+                    age[j] = auxInt;
+                    //
+                    //aqui cambiamos la categoria
+                    auxString = categoriaPelicula[j + 1];
+                    categoriaPelicula[j + 1] = categoriaPelicula[j];
+                    categoriaPelicula[j] = auxString;
+                    //
+                    //aqui cambiamos la disponibilidad
+                    auxBoolean = disponibilidadPelicula[j + 1];
+                    disponibilidadPelicula[j + 1] = disponibilidadPelicula[j];
+                    disponibilidadPelicula[j] = auxBoolean;
+
+                }
+            }
+        }
+        mostrarPeliculas();
+    }
+
+    public void llenarMatriz(int idPeli, int idCliente, int dias) {
+        for (int x = 0; x < prestamoPeliculas.length; x++) {
+            for (int y = 0; y < prestamoPeliculas[x].length; y++) {
+                if(prestamoPeliculas[x][0] != 0){
+                    prestamoPeliculas[x][y] = idPeli;
+                    prestamoPeliculas[x][y+1] = idCliente;
+                    prestamoPeliculas[x][y+2] = dias;
+                }
+            }
+        }
     }
 }
