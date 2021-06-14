@@ -158,7 +158,7 @@ public class Practica2 {
                 }
             }
         }
-        System.out.println("Aun no hay pelicuas ingresadas");
+        System.out.println("Aun no hay peliculas ingresadas");
         return false;
     }
 
