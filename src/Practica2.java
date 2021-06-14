@@ -22,6 +22,7 @@ public class Practica2 {
     int[] age = new int[30];
     String[] categoriaPelicula = new String[30];
     boolean[] disponibilidadPelicula = new boolean[30];
+    int[] vecesPrestada = new int[30];
     //
 
     //prestamo de peliculas
@@ -30,44 +31,48 @@ public class Practica2 {
 
     /**
      * herramientas de control Estos contadores serviran para dar automaticamnte
-     * un id a cliente y pelicula asi aseguramos que no se repita
+     * un id a cliente y pelicula asi aseguramos que no se repita, ademas en la
+     * matriz creada pondremos definidas las categorias de las peliculas
      */
     int contadorIdCliente = 0;
     int contadorIdPelicula = 0;
+    String[][] categorias = {{"Comedia", "0"}, {"Accion", "0"}, {"Terror", "0"}, {"Ficcion", "0"}, {"Infantil", "0"}};
 
     //
     public Practica2() {
-        int opcion = 0;
-        while (opcion != 9) {
+        String opcion = "";
+        while (!opcion.equals("9")) {
             System.out.println("");
             System.out.println("***\tBIENVENIDO\t***");
             System.out.println("¿Que desea hacer?");
             System.out.println("1.Prestamo de peliculas\n2.Devolucion de peliculas\n3.Mostrar las peliculas\n4.Ingreso de pelicula\n5.Ordenar peliculas A-Z\n6.Ingresar clientes nuevos\n7.Mostrar clientes\n8.Reportes\n9.Salir");
-            opcion = scanner.nextInt();
+            opcion = scanner.next();
             switch (opcion) {
-                case 1:
+                case "1":
                     prestarPeliculas();
                     break;
-                case 2:
+                case "2":
+                    devolverPeliculas();
                     break;
-                case 3:
+                case "3":
                     mostrarPeliculas();
                     break;
-                case 4:
+                case "4":
                     crearPelicula();
                     break;
-                case 5:
+                case "5":
                     ordenarPeliculas();
                     break;
-                case 6:
+                case "6":
                     crearCliente();
                     break;
-                case 7:
+                case "7":
                     mostrarClientes();
                     break;
-                case 8:
+                case "8":
+                    menuReportes();
                     break;
-                case 9:
+                case "9":
                     System.exit(0);
                     break;
                 default:
@@ -85,6 +90,7 @@ public class Practica2 {
         String nombre;
         int anio;
         String categoria;
+        boolean banderaCategoria = false;
         boolean disponible = true;
         contadorIdPelicula++; //aqui obtenemos el nuevo id de la pelicula
         scanner.skip("\n");
@@ -93,9 +99,26 @@ public class Practica2 {
         System.out.println("Ingrese año de salida");
         anio = scanner.nextInt();
         scanner.skip("\n");
-        System.out.println("Ingrse categoria");
-        categoria = scanner.nextLine();
+        categoria = pedirCategoria();
         guardarPelicula(nombre, anio, categoria, disponible);
+        sumarCategoria(categoria);
+    }
+
+    /**
+     * Este metodo suma la cantidad que una categoria posse de peliculas
+     * registradas
+     *
+     * @param categoria
+     */
+    public void sumarCategoria(String categoria) {
+        int cantidad;
+        for (int x = 0; x < categorias.length; x++) {
+            if (categorias[x][0].equals(categoria)) {
+                cantidad = Integer.valueOf(categorias[x][1]);
+                cantidad++;
+                categorias[x][1] = String.valueOf(cantidad);
+            }
+        }
     }
 
     /**
@@ -123,6 +146,8 @@ public class Practica2 {
 
     /**
      * Este metodo muetra las peliculas
+     *
+     * @return
      */
     public boolean mostrarPeliculas() {
         if (idPelicula[0] != 0) {
@@ -164,6 +189,7 @@ public class Practica2 {
                     dias = scanner.nextInt();
                     cambiarEdadoPelicula(idPelicula, false);
                     cambiarEstadoCliente(idCliente, true);
+                    sumarVecesPrestadaUnaPelicula(idPelicula);
                     llenarMatriz(idPelicula, idCliente, dias);
                     System.out.println("Pelicula prestada");
                 } else {
@@ -179,8 +205,23 @@ public class Practica2 {
     }
 
     /**
+     * este metodo recibe un id y lo compara para luego sumar las veces que a
+     * sido prestada
+     *
+     * @param id
+     */
+    public void sumarVecesPrestadaUnaPelicula(int id) {
+        for (int x = 0; x < idPelicula.length; x++) {
+            if (idPelicula[x] == id) {
+                vecesPrestada[x]++;
+            }
+        }
+    }
+
+    /**
      * Este metodo evalua si el cliente tiene en posecion o no una pelicula
      *
+     * @param id
      * @return
      */
     public boolean estadoCliente(int id) {
@@ -299,6 +340,7 @@ public class Practica2 {
         return false;
     }
 
+    //este estde metodo aplicamos el metodo burbuja para ordenar
     public void ordenarPeliculas() {
 
         int i;
@@ -333,6 +375,11 @@ public class Practica2 {
                     auxBoolean = disponibilidadPelicula[j + 1];
                     disponibilidadPelicula[j + 1] = disponibilidadPelicula[j];
                     disponibilidadPelicula[j] = auxBoolean;
+                    //
+                    //aqui cambiamos las veces que han sido prestadas
+                    auxInt = vecesPrestada[j + 1];
+                    vecesPrestada[j + 1] = vecesPrestada[j];
+                    vecesPrestada[j] = auxInt;
 
                 }
             }
@@ -340,15 +387,247 @@ public class Practica2 {
         mostrarPeliculas();
     }
 
+    //este metodo llena cada fila de la matriz con el id de la elicula, id del cliente que la tiene, y los dias que esta prestada
     public void llenarMatriz(int idPeli, int idCliente, int dias) {
+        int y = 0;
         for (int x = 0; x < prestamoPeliculas.length; x++) {
-            for (int y = 0; y < prestamoPeliculas[x].length; y++) {
-                if(prestamoPeliculas[x][0] != 0){
-                    prestamoPeliculas[x][y] = idPeli;
-                    prestamoPeliculas[x][y+1] = idCliente;
-                    prestamoPeliculas[x][y+2] = dias;
+
+            if (prestamoPeliculas[x][y] == 0) {
+                prestamoPeliculas[x][y] = idPeli;
+                prestamoPeliculas[x][y + 1] = idCliente;
+                prestamoPeliculas[x][y + 2] = dias;
+                return;
+            }
+        }
+    }
+
+    //mostramos las peliculas prestadas
+    public boolean mostrarPrestados() {
+        String nombrePelicula;
+        String nombreCliente;
+        int y = 0;
+        if (prestamoPeliculas[0][0] != 0) {
+            for (int x = 0; x < prestamoPeliculas.length; x++) {
+                nombrePelicula = buscarNombrePelicula(prestamoPeliculas[x][y]);
+                nombreCliente = buscarNombreCliente(prestamoPeliculas[x][y + 1]);
+                System.out.println("Id de pelicula: " + prestamoPeliculas[x][y] + " Nombre pelicula: " + nombrePelicula + " Nombre Cliente: " + nombreCliente);
+                if (prestamoPeliculas[x + 1][y] == 0) {
+                    return true;
                 }
             }
         }
+        System.out.println("No hay peliculas prestadas");
+        return false;
+    }
+
+    //en este metodo tomamos en cuenta el id de la pelicula y retonrnamos su nombre
+    public String buscarNombrePelicula(int id) {
+        for (int x = 0; x < idPelicula.length; x++) {
+            if (id == idPelicula[x]) {
+                return nombrePelicula[x];
+            }
+        }
+        return "null";
+    }
+
+    //tomamos en cuenta el id del cliente y retonramos su nombre
+    public String buscarNombreCliente(int id) {
+        for (int x = 0; x < idCliente.length; x++) {
+            if (id == idCliente[x]) {
+                return nombreCliente[x];
+            }
+        }
+        return "null";
+    }
+
+    //tomamos en cuenta el id de la pelicua y retonramos el id del cliente
+    public int buscarIdCliente(int id) {
+        for (int x = 0; x < prestamoPeliculas.length; x++) {
+            if (prestamoPeliculas[x][0] == id) {
+                return prestamoPeliculas[x][1];
+            }
+        }
+        return 0;
+    }
+
+    //devolver peliculas
+    public void devolverPeliculas() {
+        int idPeli;
+        int idCliente;
+        if (mostrarPrestados() != false) {
+            do {
+                System.out.println("Ingrese id valido de pelicula a devolver");
+                idPeli = scanner.nextInt();
+                idCliente = buscarIdCliente(idPeli);
+            } while (verificarYEliminarPeliculaPrestada(idPeli) != true);
+            cambiarEdadoPelicula(idPeli, true);
+            cambiarEstadoCliente(idCliente, false);
+            System.out.println("Pelicula devuelta");
+
+        }
+    }
+
+    //verificar si peliculaprestada existe
+    public boolean verificarYEliminarPeliculaPrestada(int id) {
+        for (int x = 0; x < prestamoPeliculas.length; x++) {
+            if (prestamoPeliculas[x][0] == id) {
+                prestamoPeliculas[x][0] = 0;
+                prestamoPeliculas[x][1] = 0;
+                prestamoPeliculas[x][2] = 0;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //este s el menu de los reportes
+    public void menuReportes() {
+        String opcion = "";
+        String categoria = "";
+        while (!opcion.equals("6")) {
+            System.out.println("");
+            System.out.println("***\tBIENVENIDO\t***");
+            System.out.println("¿Que tipo de reporte desea ver?");
+            System.out.println("1.Cantidad de peliculas por categoria\n2.Peliculas de categoria en especifico\n3.Películas y la cantidad de veces que se presta\n4.Pelicula mas prestada\n5.Pelicula menos prestada\n6.Regresar");
+            opcion = scanner.next();
+            switch (opcion) {
+                case "1":
+                    imprimirCategorias();
+                    break;
+                case "2":
+                    categoria = pedirCategoria();
+                    imprimirPeliculasPorCategoria(categoria);
+                    break;
+                case "3":
+                    mostrarPeliculaYvecesPrestada();
+                    break;
+                case "4":
+                    saberQuePeliculaEsLaMasPrestada();
+                    break;
+                case "5":
+                    saberQuePeliculaEsLaMenosPrestada();
+                    break;
+                case "6":
+                    break;
+                default:
+                    System.err.println("Opcion invalida");
+                    break;
+            }
+        }
+    }
+
+    //en este metodo imprimimos las categorias con las veces que la prestaron
+    public void imprimirCategorias() {
+        for (int x = 0; x < categorias.length; x++) {
+            System.out.println("La categoria " + categorias[x][0] + " tiene " + categorias[x][1] + " peliculas registradas");
+        }
+    }
+
+    //imprimir peliculas de cierta categoria
+    public void imprimirPeliculasPorCategoria(String categoria) {
+        boolean banderaHayExistencias = false;
+        if (idPelicula[0] != 0) {
+            for (int x = 0; x < categoriaPelicula.length; x++) {
+                if (categoriaPelicula[x] != null && categoriaPelicula[x].equals(categoria)) {
+                    banderaHayExistencias = true;
+                    System.out.println("Id: " + idPelicula[x] + " Nombre: " + nombrePelicula[x] + " Año: " + age[x] + " Categoria: " + categoriaPelicula[x] + " Disponibilidad: " + disponibilidadPelicula[x]);
+                    if (idPelicula[x + 1] == 0) {
+                        return;
+                    }
+                }
+            }
+            if (banderaHayExistencias == false) {
+                System.out.println("Esta categoria no tiene peliculas en existencia");
+            }
+        } else {
+            System.out.println("Aun no hay pelicuas ingresadas");
+        }
+    }
+
+    //pedir categoria
+    public String pedirCategoria() {
+        String categoria = "";
+        boolean banderaCategoria = false;
+        while (banderaCategoria == false) {
+            System.out.println("Ingrese categoria\n1.Comedia 2.Accion 3.Terror 4.Ficcion 5.Infantil");
+            categoria = scanner.next();
+            switch (categoria) {
+                case "1":
+                    categoria = "Comedia";
+                    banderaCategoria = true;
+                    break;
+                case "2":
+                    categoria = "Accion";
+                    banderaCategoria = true;
+                    break;
+                case "3":
+                    categoria = "Terror";
+                    banderaCategoria = true;
+                    break;
+                case "4":
+                    categoria = "Ficcion";
+                    banderaCategoria = true;
+                    break;
+                case "5":
+                    categoria = "Infantil";
+                    banderaCategoria = true;
+                    break;
+                default:
+                    System.out.println("Opcion invalida");
+                    banderaCategoria = false;
+            }
+        }
+        return categoria;
+    }
+
+    //este metodo muestra las peliculas pero con las veces que a sido prestada
+    public void mostrarPeliculaYvecesPrestada() {
+        if (idPelicula[0] != 0) {
+            for (int x = 0; x < idPelicula.length; x++) {
+                System.out.println("Id: " + idPelicula[x] + " Nombre: " + nombrePelicula[x] + " Año: " + age[x] + " Categoria: " + categoriaPelicula[x] + " Disponibilidad: " + disponibilidadPelicula[x] + " Se a prestado: " + vecesPrestada[x] + " veces");
+                if (idPelicula[x + 1] == 0) {
+                    return;
+                }
+            }
+        } else {
+            System.out.println("Aun no hay pelicuas ingresadas");
+        }
+    }
+
+    //aqui evaluamos la pelicula mas prestada
+    public void saberQuePeliculaEsLaMasPrestada() {
+        int max = 0;
+        int pos = 0;
+        if (idPelicula[0] != 0) {
+            for (int x = 0; x < vecesPrestada.length; x++) {
+                if (vecesPrestada[x] > max) {
+                    max = vecesPrestada[x];
+                    pos = x;
+                }
+            }
+            System.out.println("La pelicula mas prestada es: " + nombrePelicula[pos] + ", La han prestado: " + max + " veces");
+        } else {
+            System.out.println("Aun no se han registrado peliculas");
+        }
+
+    }
+
+    //saber que pelicula es la menos prstada
+    public void saberQuePeliculaEsLaMenosPrestada() {
+        int min;
+        int pos = 0;
+        if (idPelicula[0] != 0) {
+            min = vecesPrestada[0];
+            for (int x = 0; x < vecesPrestada.length; x++) {
+                if (idPelicula[x] != 0 && vecesPrestada[x] < min) {
+                    min = vecesPrestada[x];
+                    pos = x;
+                }
+            }
+            System.out.println("La pelicula menos prestada es: " + nombrePelicula[pos] + ", La han prestado: " + min + " veces");
+        } else {
+            System.out.println("Aun no se han registrado peliculas");
+        }
+
     }
 }
