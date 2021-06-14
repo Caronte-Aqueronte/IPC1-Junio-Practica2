@@ -90,18 +90,20 @@ public class Practica2 {
         String nombre;
         int anio;
         String categoria;
-        boolean banderaCategoria = false;
         boolean disponible = true;
-        contadorIdPelicula++; //aqui obtenemos el nuevo id de la pelicula
-        scanner.skip("\n");
-        System.out.println("Ingrese nombre de la pelicula");
-        nombre = scanner.nextLine();
-        System.out.println("Ingrese año de salida");
-        anio = scanner.nextInt();
-        scanner.skip("\n");
-        categoria = pedirCategoria();
-        guardarPelicula(nombre, anio, categoria, disponible);
-        sumarCategoria(categoria);
+        String opcion = "";
+        while (!opcion.equals("s")) {
+            scanner.skip("\n");
+            System.out.println("Ingrese nombre de la pelicula");
+            nombre = scanner.nextLine();
+            System.out.println("Ingrese año de salida");
+            anio = scanner.nextInt();
+            scanner.skip("\n");
+            categoria = pedirCategoria();
+            guardarPelicula(nombre, anio, categoria, disponible);
+            System.out.println("Cualquier letra para continuar, s para salir");
+            opcion = scanner.next();
+        }
     }
 
     /**
@@ -117,6 +119,7 @@ public class Practica2 {
                 cantidad = Integer.valueOf(categorias[x][1]);
                 cantidad++;
                 categorias[x][1] = String.valueOf(cantidad);
+                return;
             }
         }
     }
@@ -130,6 +133,7 @@ public class Practica2 {
      * @param disponible
      */
     public void guardarPelicula(String nombre, int anio, String categoria, boolean disponible) {
+        contadorIdPelicula++; //aqui obtenemos el nuevo id de la pelicula
         for (int x = 0; x < idPelicula.length; x++) {
             if (idPelicula[x] == 0) {
                 idPelicula[x] = contadorIdPelicula;
@@ -137,6 +141,7 @@ public class Practica2 {
                 age[x] = anio;
                 categoriaPelicula[x] = categoria;
                 disponibilidadPelicula[x] = disponible;
+                sumarCategoria(categoria);
                 System.out.println("Pelicula guardada");
                 return;
             }
@@ -153,12 +158,17 @@ public class Practica2 {
         if (idPelicula[0] != 0) {
             for (int x = 0; x < idPelicula.length; x++) {
                 System.out.println("Id: " + idPelicula[x] + " Nombre: " + nombrePelicula[x] + " Año: " + age[x] + " Categoria: " + categoriaPelicula[x] + " Disponibilidad: " + disponibilidadPelicula[x]);
-                if (idPelicula[x + 1] == 0) {
+                if (x < idPelicula.length - 1) {
+                    if (idPelicula[x + 1] == 0) {
+                        return true;
+                    }
+                } else {
                     return true;
                 }
+
             }
         }
-        System.out.println("Aun no hay peliculas ingresadas");
+        System.out.println("Aun no hay pelicuas ingresadas");
         return false;
     }
 
@@ -289,14 +299,19 @@ public class Practica2 {
     public void crearCliente() {
         String nombre;
         int telefono;
-        boolean tienePrestado = false;
-        contadorIdCliente++; //aqui obtenemos el nuevo id de la pelicula
-        scanner.skip("\n");
-        System.out.println("Ingrese nombre del cliente");
-        nombre = scanner.nextLine();
-        System.out.println("Ingrese el telefono del cliente");
-        telefono = scanner.nextInt();
-        guardarCliente(nombre, telefono, tienePrestado);
+        String opcion = "";
+        while (!opcion.equals("s")) {
+            scanner.skip("\n");
+            System.out.println("Ingrese nombre del cliente");
+            nombre = scanner.nextLine();
+            System.out.println("Ingrese el telefono del cliente");
+            telefono = scanner.nextInt();
+            guardarCliente(nombre, telefono, false);
+            //  scanner.skip("\n");
+            System.out.println("Cualquier letra para continuar, s para salir");
+            opcion = scanner.next();
+        }
+
     }
 
     /**
@@ -308,6 +323,7 @@ public class Practica2 {
      *
      */
     public void guardarCliente(String nombre, int telefono, boolean tienePrestado) {
+        contadorIdCliente++; //aqui obtenemos el nuevo id de la pelicula
         for (int x = 0; x < idCliente.length; x++) {
             if (idCliente[x] == 0) {
                 idCliente[x] = contadorIdCliente;
@@ -331,7 +347,11 @@ public class Practica2 {
         if (idCliente[0] != 0) {
             for (int x = 0; x < idCliente.length; x++) {
                 System.out.println("Id: " + idCliente[x] + " Nombre: " + nombreCliente[x] + " Telefono: " + telefonoCliente[x] + " Tiene prestado pelicula: " + tienePrestado[x]);
-                if (idCliente[x + 1] == 0) {
+                if (x < idCliente.length - 1) {
+                    if (idCliente[x + 1] == 0) {
+                        return true;
+                    }
+                } else {
                     return true;
                 }
             }
@@ -391,7 +411,6 @@ public class Practica2 {
     public void llenarMatriz(int idPeli, int idCliente, int dias) {
         int y = 0;
         for (int x = 0; x < prestamoPeliculas.length; x++) {
-
             if (prestamoPeliculas[x][y] == 0) {
                 prestamoPeliculas[x][y] = idPeli;
                 prestamoPeliculas[x][y + 1] = idCliente;
@@ -531,7 +550,11 @@ public class Practica2 {
                 if (categoriaPelicula[x] != null && categoriaPelicula[x].equals(categoria)) {
                     banderaHayExistencias = true;
                     System.out.println("Id: " + idPelicula[x] + " Nombre: " + nombrePelicula[x] + " Año: " + age[x] + " Categoria: " + categoriaPelicula[x] + " Disponibilidad: " + disponibilidadPelicula[x]);
-                    if (idPelicula[x + 1] == 0) {
+                    if (x < idPelicula.length - 1) {
+                        if (idPelicula[x + 1] == 0) {
+                            return;
+                        }
+                    } else {
                         return;
                     }
                 }
@@ -585,7 +608,11 @@ public class Practica2 {
         if (idPelicula[0] != 0) {
             for (int x = 0; x < idPelicula.length; x++) {
                 System.out.println("Id: " + idPelicula[x] + " Nombre: " + nombrePelicula[x] + " Año: " + age[x] + " Categoria: " + categoriaPelicula[x] + " Disponibilidad: " + disponibilidadPelicula[x] + " Se a prestado: " + vecesPrestada[x] + " veces");
-                if (idPelicula[x + 1] == 0) {
+                if (x < idPelicula.length - 1) {
+                    if (idPelicula[x + 1] == 0) {
+                        return;
+                    }
+                } else {
                     return;
                 }
             }
